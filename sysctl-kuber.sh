@@ -47,16 +47,6 @@ else
     vm_dirty_ratio=5
 fi
 
-#echo "Update ulimit for $host"
-#>/etc/security/limits.d/25-kanux.conf cat << EOF
-#
-#kafka soft nofile $ulimitMax
-#kafka soft nproc  $ulimitMax
-#kafka hard nofile $ulimitMax
-#kafka hard nproc  $ulimitMax
-#
-#EOF
-
 echo "Update sysctl for $host"
 >/etc/sysctl.d/10-kanux.conf cat << EOF
 kernel.printk = 4 4 1 7
