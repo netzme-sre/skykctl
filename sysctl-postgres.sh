@@ -27,6 +27,8 @@ fi
 mem_bytes=$(awk '/MemTotal:/ { printf "%0.f",$2 * 1024}' /proc/meminfo)
 shmmax=$(echo "$mem_bytes * 0.80" | bc | cut -f 1 -d '.')
 shmall=$(expr $mem_bytes / $(getconf PAGE_SIZE))
+hugepage_mem=$(echo "$mem_bytes / 4"| bc |cut -f 1 -d '.')
+hugepage_size=$(echo "$hugepage_mem / 2097152"|bc|cut -f 1 -d '.')
 max_orphan=$(echo "$mem_bytes * 0.10 / 65536" | bc | cut -f 1 -d '.')
 file_max=$(echo "$mem_bytes / 4194304 * 256" | bc | cut -f 1 -d '.')
 if [ $file_max -lt 1048576 ]; then
@@ -48,7 +50,7 @@ else
 fi
 
 echo "Update ulimit for $host"
->/etc/security/limits.d/25-kanux.conf cat << EOF
+>/etc/security/limits.d/90-kanux.conf cat << EOF
 
 postgres soft nofile $ulimitMax
 postgres soft nproc  $ulimitMax
@@ -58,20 +60,22 @@ postgres hard nproc  $ulimitMax
 EOF
 
 echo "Update sysctl for $host"
->/etc/sysctl.d/10-kanux.conf cat << EOF
+>/etc/sysctl.d/90-kanux.conf cat << EOF
 kernel.printk = 4 4 1 7
 kernel.panic = 10
 kernel.sysrq = 0
-kernel.sem=250 32000 256 256
+kernel.sem=256 65536 128 256
 kernel.shmmax = $shmmax
 kernel.shmall = $shmall
 kernel.core_uses_pid = 1
 kernel.msgmnb = 65536
 kernel.msgmax = 65536
+kernel.sched_migration_cost_ns = 500000
+vm.nr_hugepages = $hugepage_size
 vm.swappiness = 1
-vm.dirty_ratio = 80
+vm.dirty_ratio = 15
 vm.dirty_background_ratio = 5
-vm.dirty_expire_centisecs = 12000
+vm.dirty_expire_centisecs = 3000
 vm.min_free_kbytes = $min_free
 fs.file-max = $file_max
 fs.nr_open= $nr_open

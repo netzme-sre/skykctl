@@ -48,7 +48,7 @@ else
 fi
 
 echo "Update ulimit for $host"
->/etc/security/limits.d/25-kanux.conf cat << EOF
+>/etc/security/limits.d/90-kanux.conf cat << EOF
 
 kafka soft nofile $ulimitMax
 kafka soft nproc  $ulimitMax
@@ -58,20 +58,20 @@ kafka hard nproc  $ulimitMax
 EOF
 
 echo "Update sysctl for $host"
->/etc/sysctl.d/10-kanux.conf cat << EOF
+>/etc/sysctl.d/90-kanux.conf cat << EOF
 kernel.printk = 4 4 1 7
 kernel.panic = 10
 kernel.sysrq = 0
-kernel.sem=250 32000 256 256
+kernel.sem=256 65536 128 256
 kernel.shmmax = $shmmax
 kernel.shmall = $shmall
 kernel.core_uses_pid = 1
 kernel.msgmnb = 65536
 kernel.msgmax = 65536
 vm.swappiness = 1
-vm.dirty_ratio = 80
+vm.dirty_ratio = 20
 vm.dirty_background_ratio = 5
-vm.dirty_expire_centisecs = 12000
+vm.dirty_expire_centisecs = 3000
 vm.min_free_kbytes = $min_free
 fs.file-max = $file_max
 fs.nr_open= $nr_open
