@@ -146,6 +146,9 @@ net.ipv4.conf.all.rp_filter = 1
 net.ipv4.conf.all.log_martians = 1
 net.ipv4.inet_peer_gc_mintime = 5
 net.bridge.bridge-nf-call-iptables = 1
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
 EOF
 
 sysctl --system
