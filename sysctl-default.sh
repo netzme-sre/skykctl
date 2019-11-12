@@ -48,7 +48,7 @@ else
 fi
 
 echo "Update sysctl for $host"
->/etc/sysctl.d/90-kanux.conf cat << EOF
+>/etc/sysctl.d/99-kanux.conf cat << EOF
 kernel.printk = 4 4 1 7
 kernel.panic = 10
 kernel.sysrq = 0

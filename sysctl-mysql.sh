@@ -50,7 +50,7 @@ else
 fi
 
 echo "Update ulimit for $host"
->/etc/security/limits.d/90-kanux.conf cat << EOF
+>/etc/security/limits.d/99-kanux.conf cat << EOF
 
 mysql soft nofile $ulimitMax
 mysql soft nproc  $ulimitMax

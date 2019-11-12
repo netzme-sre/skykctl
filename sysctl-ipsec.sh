@@ -1,4 +1,6 @@
 #!/bin/bash
+
+#!/bin/bash
 #vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4:
 # author - sakayk
 # HOW TO USE
@@ -47,16 +49,6 @@ else
     vm_dirty_ratio=5
 fi
 
-echo "Update ulimit for $host"
->/etc/security/limits.d/90-kanux.conf cat << EOF
-
-cassandra soft nofile $ulimitMax
-cassandra soft nproc  $ulimitMax
-cassandra hard nofile $ulimitMax
-cassandra hard nproc  $ulimitMax
-
-EOF
-
 echo "Update sysctl for $host"
 >/etc/sysctl.d/99-kanux.conf cat << EOF
 kernel.printk = 4 4 1 7
@@ -75,7 +67,6 @@ vm.dirty_expire_centisecs = 3000
 vm.min_free_kbytes = $min_free
 fs.file-max = $file_max
 fs.nr_open= $nr_open
-
 net.core.netdev_max_backlog = 2500
 net.core.rmem_default = 212992
 net.core.rmem_max = 16777216
@@ -98,7 +89,6 @@ net.netfilter.nf_conntrack_tcp_timeout_last_ack = 20
 net.netfilter.nf_conntrack_tcp_timeout_syn_recv = 20
 net.netfilter.nf_conntrack_tcp_timeout_syn_sent = 20
 net.netfilter.nf_conntrack_tcp_timeout_time_wait = 10
-net.ipv4.conf.default.rp_filter = 0
 net.ipv4.tcp_slow_start_after_idle = 0
 net.ipv4.ip_local_port_range = 1000 65535
 net.ipv4.ip_no_pmtu_disc = 1
@@ -134,14 +124,29 @@ net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_keepalive_intvl = 60
 net.ipv4.tcp_keepalive_probes = 10
 net.ipv4.tcp_no_metrics_save = 1
-net.ipv4.ip_forward = 0
 net.ipv4.conf.all.accept_redirects = 0
 net.ipv4.conf.all.send_redirects = 0
 net.ipv4.conf.all.accept_source_route = 0
-net.ipv4.conf.all.rp_filter = 1
 net.ipv4.conf.all.log_martians = 1
 net.ipv4.inet_peer_gc_mintime = 5
 net.bridge.bridge-nf-call-iptables = 1
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+# ipsec purpose
+net.ipv4.ip_forward = 1
+net.ipv4.conf.all.rp_filter = 2
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.eth0.rp_filter = 2
+net.ipv4.conf.eth0.accept_redirects = 0
+net.ipv4.conf.eth0.send_redirects = 0
+net.ipv4.conf.ip_vti0.rp_filter = 2
+net.ipv4.conf.ip_vti0.accept_redirects = 0
+net.ipv4.conf.ip_vti0.send_redirects = 0
 net.ipv6.conf.all.disable_ipv6 = 1
 net.ipv6.conf.default.disable_ipv6 = 1
 net.ipv6.conf.lo.disable_ipv6 = 1
