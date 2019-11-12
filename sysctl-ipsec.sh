@@ -124,8 +124,6 @@ net.ipv4.tcp_keepalive_time = 600
 net.ipv4.tcp_keepalive_intvl = 60
 net.ipv4.tcp_keepalive_probes = 10
 net.ipv4.tcp_no_metrics_save = 1
-net.ipv4.conf.all.accept_redirects = 0
-net.ipv4.conf.all.send_redirects = 0
 net.ipv4.conf.all.accept_source_route = 0
 net.ipv4.conf.all.log_martians = 1
 net.ipv4.inet_peer_gc_mintime = 5
@@ -147,9 +145,6 @@ net.ipv4.conf.eth0.send_redirects = 0
 net.ipv4.conf.ip_vti0.rp_filter = 2
 net.ipv4.conf.ip_vti0.accept_redirects = 0
 net.ipv4.conf.ip_vti0.send_redirects = 0
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
 EOF
 
 sysctl --system
