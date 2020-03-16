@@ -40,6 +40,8 @@ mem_bytes=$(awk '/MemTotal:/ { printf "%0.f",$2 * 1024}' /proc/meminfo)
 max_map_count=$(awk '/MemTotal:/ { printf "%0.f",($2/128)*0.9}' /proc/meminfo)
 shmmax=$(echo "$mem_bytes * 0.80" | bc | cut -f 1 -d '.')
 shmall=$(expr $shmmax / $(getconf PAGE_SIZE))
+hugepage_mem=$(echo "$mem_bytes / 4"| bc |cut -f 1 -d '.')
+hugepage_size=$(echo "$hugepage_mem / 2097152"|bc|cut -f 1 -d '.')
 min_free=$(echo "($mem_bytes / 1024) * 0.01" | bc | cut -f 1 -d '.')
 max_orphan=$(echo "$mem_bytes * 0.10 / 65536" | bc | cut -f 1 -d '.')
 file_max=$(echo "$mem_bytes / 4194304 * 256" | bc | cut -f 1 -d '.')
@@ -53,7 +55,7 @@ fi
 
 if [ "$1" != "ssd" ]; then
     vm_dirty_bg_ratio=5
-    vm_dirty_ratio=15
+    vm_dirty_ratio=20
 else
     # This setup is generally ok for ssd and highmem servers
     vm_dirty_bg_ratio=3
