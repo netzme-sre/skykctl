@@ -2,7 +2,9 @@
 sysctl tunning for every type of service.
 
 how to use :
+
 curl the raw sysctl file and execute it as the root user
+
 example :
 
 ```
@@ -12,6 +14,7 @@ sudo ./sysctl-postgres.sh
 ```
 
 if you use ssd for the disk, add ssd as variable
+
 example :
 
 ```
