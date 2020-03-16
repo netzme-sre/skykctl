@@ -4,8 +4,8 @@
 # HOW TO USE
 # run ./sysctltunning.sh
 # nanti akan terbentuk 2 buah file :
-# 1. /etc/security/limits.d/20-kanux.conf
-# 2. /etc/sysctl.d/10-kanux.conf
+# 1. /etc/security/limits.d/90-lnxid.conf
+# 2. /etc/sysctl.d/99-lnxid.conf
 # untuk sysctl setelah copy, jalankan perintah : sysctl --system
 #
 # chkconfig: 2345 20 85
@@ -17,26 +17,39 @@ SYSCTL_RUN(){
 host=$(hostname)
 ARCH=$(uname -m)
 
+if [ $(id -u) -ne 0 ]; then
+    echo "Must run by root user"
+    exit 1
+fi
+
 which bc > /dev/null
 if [ $? -ne 0 ]; then
-    echo "This script require GNU bc, cf. http://www.gnu.org/software/bc/"
-    echo "On Linux Debian/Ubuntu you can install it by doing : apt-get install bc"
-    yum install -y bc
+    if [ -f /etc/redhat-release ]; then
+        yum install -y bc
+    elif [ -f /etc/debian_version ]; then
+		    apt-get -y install bc
+    elif [ -f /etc/arch-release ]; then
+		    pacman -Sy --noconfirm bc
+    else	
+        echo "This script require GNU bc, cf. http://www.gnu.org/software/bc/"
+        exit 1
+    fi
 fi
 
 mem_bytes=$(awk '/MemTotal:/ { printf "%0.f",$2 * 1024}' /proc/meminfo)
+max_map_count=$(awk '/MemTotal:/ { printf "%0.f",($2/128)*0.9}' /proc/meminfo)
 shmmax=$(echo "$mem_bytes * 0.80" | bc | cut -f 1 -d '.')
-shmall=$(expr $mem_bytes / $(getconf PAGE_SIZE))
+shmall=$(expr $shmmax / $(getconf PAGE_SIZE))
+min_free=$(echo "($mem_bytes / 1024) * 0.01" | bc | cut -f 1 -d '.')
 max_orphan=$(echo "$mem_bytes * 0.10 / 65536" | bc | cut -f 1 -d '.')
 file_max=$(echo "$mem_bytes / 4194304 * 256" | bc | cut -f 1 -d '.')
+ulimitMax=$(echo "($file_max - ($file_max * 10 / 100))" | bc | cut -f 1 -d '.')
+max_tw=$(($file_max*2))
 if [ $file_max -lt 1048576 ]; then
   nr_open=1048576
 else
   nr_open=$file_max
 fi
-max_tw=$(($file_max*2))
-min_free=$(echo "($mem_bytes / 1024) * 0.01" | bc | cut -f 1 -d '.')
-ulimitMax=$(echo "($file_max - ($file_max * 10 / 100))" | bc | cut -f 1 -d '.')
 
 if [ "$1" != "ssd" ]; then
     vm_dirty_bg_ratio=5
@@ -47,8 +60,16 @@ else
     vm_dirty_ratio=5
 fi
 
+echo "Update ulimit for $host"
+>/etc/security/limits.d/90-lnxid.conf cat << EOF
+* soft nofile $ulimitMax
+* soft nproc  $ulimitMax
+* hard nofile $ulimitMax
+* hard nproc  $ulimitMax
+EOF
+
 echo "Update sysctl for $host"
->/etc/sysctl.d/99-kanux.conf cat << EOF
+>/etc/sysctl.d/99-lnxid.conf cat << EOF
 kernel.printk = 4 4 1 7
 kernel.panic = 10
 kernel.sysrq = 0
@@ -63,6 +84,7 @@ vm.dirty_ratio = 20
 vm.dirty_background_ratio = 5
 vm.dirty_expire_centisecs = 3000
 vm.min_free_kbytes = $min_free
+vm.max_map_count = $max_map_count
 fs.file-max = $file_max
 fs.nr_open= $nr_open
 
