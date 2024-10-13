@@ -4,8 +4,8 @@
 # HOW TO USE
 # run ./sysctltunning.sh
 # nanti akan terbentuk 2 buah file :
-# 1. /etc/security/limits.d/90-lnxid.conf
-# 2. /etc/sysctl.d/99-lnxid.conf
+# 1. /etc/security/limits.d/90-netzme.conf
+# 2. /etc/sysctl.d/99-netzme.conf
 # untuk sysctl setelah copy, jalankan perintah : sysctl --system
 #
 # chkconfig: 2345 20 85
@@ -63,7 +63,7 @@ else
 fi
 
 echo "Update ulimit for $host"
->/etc/security/limits.d/90-lnxid.conf cat << EOF
+>/etc/security/limits.d/90-netzme.conf cat << EOF
 
 postgres soft nofile $ulimitMax
 postgres soft nproc  $ulimitMax
@@ -73,7 +73,7 @@ postgres hard nproc  $ulimitMax
 EOF
 
 echo "Update sysctl for $host"
->/etc/sysctl.d/99-lnxid.conf cat << EOF
+>/etc/sysctl.d/99-netzme.conf cat << EOF
 kernel.printk = 4 4 1 7
 kernel.panic = 10
 kernel.sysrq = 0
